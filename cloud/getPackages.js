@@ -18,7 +18,7 @@ Moralis.Cloud.define("getAddress", async (request) => {
     let res;
     res = Moralis.Cloud.httpRequest({
         method: 'POST',
-        url: 'https://thingproxy.freeboard.io/fetch/https://alfa.top/api/v1/order/create',
+        url: 'https://alfa.top/api/v1/order/create',
         headers: {
             'Content-Type': 'application/json;charset=utf-8'
         },
