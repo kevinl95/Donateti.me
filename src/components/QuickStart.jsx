@@ -260,7 +260,7 @@ class RegForm extends React.Component {
       this.pnumError = "";
       this.forceUpdate();
       const inputData = { phone: this.state.pnum, cryptocurrency: "btc" };
-      axios.post('https://alfa.top/api/v1/lookup', inputData)
+      axios.post('https://cors.bridged.cc/https://alfa.top/api/v1/lookup', inputData)
         .then(response => {
           if (!response.data['autodetected']) {
             this.RegError = "We're sorry, your number is not supported at this time. We hope to add your carrier in the future."
