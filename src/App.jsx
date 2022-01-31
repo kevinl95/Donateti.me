@@ -96,24 +96,12 @@ const App = ({ isServerInfo }) => {
       </Router>
       <Footer style={{ textAlign: "center" }}>
         <Text style={{ display: "block" }}>
-          Tor Hidden Service Address:
-          <a
-            href="https://github.com/ethereum-boilerplate/ethereum-boilerplate/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            here
-          </a>
-        </Text>
-
-        <Text style={{ display: "block" }}>
-          Privacy Policy: 
           <a
             target="_blank"
             rel="noopener noreferrer"
-            href="https://moralis.io?utm_source=boilerplatehosted&utm_medium=todo&utm_campaign=ethereum-boilerplat"
+            href="https://www.termsfeed.com/live/1ad98fa7-3769-46dd-bb53-d54a89aeacf3"
           >
-            Here
+            Privacy Policy
           </a>
         </Text>
       </Footer>

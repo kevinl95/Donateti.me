@@ -29,11 +29,38 @@ const styles = {
   },
 };
 
-function GetAmount(props) {
-  const [amount, setAmount] = useState();
+function PayWidget(props) {
+  const [address, setAddress] = useState();
   const Moralis = require('moralis');
   const handleGet = async () => {
     var ourCode = props.code;
+    const params =  { code: ourCode };
+    const res = await Moralis.Cloud.run("getAddress", params);
+    console.log(res);
+    setAddress(res.replace(/\\/g, ""));
+  };
+  return (
+    <>
+      <div>
+        <h2>Pay</h2>
+        <h2>If this is acceptable, press Pay below to get the payment address and final amount. You will have 15 minutes to transfer the funds or the donation will be automatically canceled.</h2>
+        <button
+          onClick={() => handleGet()}
+        >Pay
+        </button>
+        <br></br>
+        <h2>After clicking pay your unique payment URL will appear momentarily. You can then complete your donation.</h2>
+        <a href={address}>{address}</a>
+      </div>
+    </>
+  );
+}
+
+function GetAmount(props) {
+  const [amount, setAmount] = useState();
+  const Moralis = require('moralis');
+  var ourCode = props.code;
+  const handleGet = async () => {
     const params =  { code: ourCode };
     const res = await Moralis.Cloud.run("getAmount", params);
     const status = await axios.get('https://api.covalenthq.com/v1/pricing/tickers/?quote-currency=USD&format=JSON&key=ckey_23ecd94f0d744665b9b223b9604');
@@ -62,6 +89,7 @@ function GetAmount(props) {
         </button>
         <br></br>
         <p>{amount}</p>
+        <PayWidget code={ourCode}/>
       </div>
     </>
   );
