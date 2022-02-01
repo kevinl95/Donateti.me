@@ -243,7 +243,6 @@ class RegForm extends React.Component {
     this.setState({ showModal: false });
   }
   handleSubmit(event) {
-    console.log('A name was submitted: ' + this.state.email + ' ' + this.state.pnum);
     var invalidInput = false;
     if (!validator.isEmail(this.state.email)) {
       this.emailError = "Invalid email address";
@@ -260,7 +259,7 @@ class RegForm extends React.Component {
       this.pnumError = "";
       this.forceUpdate();
       const inputData = { phone: this.state.pnum, cryptocurrency: "btc" };
-      axios.post('https://alfa.top/api/v1/lookup', inputData)
+      axios.post('https://thingproxy.freeboard.io/fetch/https://alfa.top/api/v1/lookup', inputData)
         .then(response => {
           if (!response.data['autodetected']) {
             this.RegError = "We're sorry, your number is not supported at this time. We hope to add your carrier in the future."

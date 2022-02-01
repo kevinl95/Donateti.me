@@ -40,3 +40,23 @@ Moralis.Cloud.define("getAddress", async (request) => {
     },{
         fields : ['code']
 });
+Moralis.Cloud.define("getLookup", async (request) => {
+  var pnum = request.params.pnum;
+  let res;
+  res = Moralis.Cloud.httpRequest({
+      method: 'POST',
+      url: 'https://thingproxy.freeboard.io/fetch/https://alfa.top/api/v1/lookup',
+      headers: {
+          'Content-Type': 'application/json;charset=utf-8'
+      },
+      body: {
+        phone: pnum,
+        cryptocurrency: "btc"
+      }
+    }).then(function(httpResponse) {
+      return httpResponse;
+    });
+    return res;
+  },{
+      fields : ['pnum']
+});
