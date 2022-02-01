@@ -11,6 +11,11 @@ app.use(bodyParser.json());
 app.use(cors());
 app.options('*', cors());
 
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    next();
+});
 // Have Node serve the files for our built React app
 app.use(express.static(path.resolve(__dirname, './build')));
 
