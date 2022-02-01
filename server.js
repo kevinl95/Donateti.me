@@ -8,7 +8,7 @@ var cors = require('cors');
 app.use(morgan('dev'));                                        
 app.use(bodyParser.urlencoded({'extended':'true'}));            
 app.use(bodyParser.json());                                     
-app.use(cors());
+app.use(cors({origin:true,credentials: true}));
 app.options('*', cors());
 
 app.all('*', function(req, res, next) {
