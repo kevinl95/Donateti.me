@@ -16,14 +16,16 @@ app.all('*', function(req, res, next) {
     res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Content-Type');
     next();
-  });
-// Have Node serve the files for our built React app
-app.use(express.static(path.resolve(__dirname, './build')));
+});
 
 // All other GET requests not handled before will return our React app
 app.get('*', (req, res) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
     res.sendFile(path.resolve(__dirname, './build', 'index.html'));
-  });
+    next();
+});
  
 app.use(express.static('build'));
 app.set('port', process.env.PORT || 3001);
