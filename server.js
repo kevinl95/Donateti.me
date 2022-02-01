@@ -4,11 +4,15 @@ var app      = express();
 var morgan = require('morgan');            
 var bodyParser = require('body-parser');    
 var cors = require('cors');
- 
 app.use(morgan('dev'));                                        
 app.use(bodyParser.urlencoded({'extended':'true'}));            
 app.use(bodyParser.json());                                     
-app.use(cors({origin:true,credentials: true}));
+app.use(cors({
+    credentials: true,
+    preflightContinue: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH' , 'DELETE', 'OPTIONS'],
+    origin: true,
+}));
 app.options('*', cors());
 
 app.all('*', function(req, res, next) {
