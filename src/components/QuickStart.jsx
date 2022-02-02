@@ -175,23 +175,39 @@ function Save(props) {
     moralisFile,
     saveFile,
   } = useMoralisFile();
+  const Moralis = require('moralis');
   const { setUserData } = useMoralis();
   const [ipfsLink, setLink] = useState();
-  const handleSave = () => {
+  const [uniqueID, setID] = useState();
+  const [RegError, setError] = useState();
+  const handleSave = async () => {
+    const params =  { pnum: props.phone };
+    const res = await Moralis.Cloud.run("getLookup", params);
+    if (!res.data['autodetected']) {
+      setError("We're sorry, your number is not supported at this time. We hope to add your carrier in the future.");
+    }
+    var uuid = uuidv4();
+    setID(uuid);
+    var operator = res.data['available_operators'][0]['slug'];
+    var amount = res.data['packages'][0]['amount'];
+    var donateURL = "https://www.donateti.me/home/?token=" + uuid;
+    var canvas = document.getElementById('clearwebQR')
+    QRCode.toCanvas(canvas, donateURL, function (error) {
+      if (error) console.error(error)
+    })
+    setError("");
     console.log("Saving");
-    console.log(props);
     setUserData({
       email: props.email,
       phone: props.phone,
-      operator: props.operator,
-      amount: props.amount,
-      uniqueID: props.uniqueID
+      operator: operator,
+      amount: amount,
+      uniqueID: uuid
     });
     var canvas = document.getElementById('clearwebQR')
     canvas.toBlob(function(blob) {
       console.log(blob);
-      var QRUpload = saveFile(props.uniqueID + ".png", blob, { saveIPFS: true }).then(response => {
-        console.log(response);
+      var QRUpload = saveFile(uniqueID + ".png", blob, { saveIPFS: true }).then(response => {
         setLink(response["_ipfs"]);
       });
     });
@@ -199,14 +215,21 @@ function Save(props) {
   return (
     <>
       <div>
-        <h2>Save (this will erase any previous Donateti.me codes for this account)</h2>
+        <h2>Generate Code (this will erase any previous Donateti.me codes for this account)</h2>
+        <span style={{fontWeight: 'bold',}}>{RegError}</span>
+        <br></br>
         <button
           onClick={() => handleSave()}
         >Confirm and Save
         </button>
         <br></br>
+        <canvas id="clearwebQR"></canvas>
+        <br></br>
         Your Censorship-Resistant IPFS QR Code URL will be available after saving.
         <p>{ipfsLink}</p>
+        <br></br>
+        <span style={{fontWeight: 'bold',}}>{uniqueID}</span>
+        <p>You can request donations by distributing this QR code or by distributing your code which will be displayed above.</p>
       </div>
     </>
   );
@@ -221,14 +244,8 @@ class RegForm extends React.Component {
     this.pnumError = "";
     this.handleOpenModal = this.handleOpenModal.bind(this);
     this.handleCloseModal = this.handleCloseModal.bind(this);
-    this.RegError = "Loading, please wait";
-    this.uniqueID = "";
-    this.phone = "";
-    this.email = "";
-    this.operator = "";
-    this.amount = "";
+    this.RegError = "";
     this.showSave = false;
-    this.codeExplainer = "";
   }
 
   onFieldChange(fieldName) {
@@ -243,6 +260,7 @@ class RegForm extends React.Component {
     this.setState({ showModal: false });
   }
   handleSubmit(event) {
+    console.log('A name was submitted: ' + this.state.email + ' ' + this.state.pnum);
     var invalidInput = false;
     if (!validator.isEmail(this.state.email)) {
       this.emailError = "Invalid email address";
@@ -258,35 +276,7 @@ class RegForm extends React.Component {
       this.emailError = "";
       this.pnumError = "";
       this.forceUpdate();
-      const inputData = { phone: this.state.pnum, cryptocurrency: "btc" };
-      axios.post('https://thingproxy.freeboard.io/fetch/https://alfa.top/api/v1/lookup', inputData)
-        .then(response => {
-          if (!response.data['autodetected']) {
-            this.RegError = "We're sorry, your number is not supported at this time. We hope to add your carrier in the future."
-            this.forceUpdate();
-          }
-          console.log(response.data['available_operators'][0])
-          console.log(response.data['packages'][0])
-          var uniqueID = uuidv4();
-          this.uniqueID = uniqueID;
-          this.phone = this.state.pnum;
-          this.email = this.state.email;
-          this.operator = response.data['available_operators'][0]['slug'];
-          this.amount = response.data['packages'][0]['amount'];
-          var donateURL = "https://www.donateti.me/home/?token=" + uniqueID;
-          var canvas = document.getElementById('clearwebQR')
-          QRCode.toCanvas(canvas, donateURL, function (error) {
-            if (error) console.error(error)
-          })
-          this.RegError = "";
-          this.showSave = true;
-          this.codeExplainer = "After saving, you can distribute this unique Donateti.me code which users can use on this website: "
-          this.forceUpdate();
-        })
-        .catch(err => {
-          this.RegError = "Invalid input. Please verify you entered a number with a valid country code and that all digits are correct.";
-          this.forceUpdate();
-          })
+      this.showSave = true;
       this.handleOpenModal();
     }
     event.preventDefault();
@@ -317,15 +307,11 @@ class RegForm extends React.Component {
            isOpen={this.state.showModal}
            contentLabel="Create your Code"
         >
-          <br></br>
-          <br></br>
           <span style={{
           fontWeight: 'bold',
           }}>{this.RegError}</span>
-          <canvas id="clearwebQR"></canvas>
-          { this.showSave ? <Save email={this.email} phone={this.phone} operator={this.operator} amount={this.amount} uniqueID={this.uniqueID}  /> : null }
-          { this.showSave ? <span style={{fontWeight: 'bold',}}>{this.codeExplainer} {this.uniqueID}</span>: null}
-          { this.showSave ? <p>You can request donations by distributing this QR code or by distributing this code. You must save in order to begin accepting donations.</p>: null}
+          <br></br>
+          { this.showSave ? <Save email={this.state.email} phone={this.state.pnum}  /> : null }
           <br></br>
           <button onClick={this.handleCloseModal}>Close</button>
         </ReactModal>
